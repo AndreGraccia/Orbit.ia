@@ -1,5 +1,5 @@
 {
-  "name": "Mente de IAs - Estrutura Oficial Corrigida",
+  "name": "Mente de IAs - Estrutura Limpa Sem Credenciais",
   "nodes": [
     {
       "parameters": {
@@ -18,7 +18,7 @@
       ],
       "id": "7cfcfa01-a37c-44e8-b313-d912da43581c",
       "name": "Webhook",
-      "webhookId": "943a6eb5-04ce-49e6-858c-d79dc091e7e1"
+      "webhookId": "YOUR_WEBHOOK_ID"
     },
     {
       "parameters": {
@@ -124,7 +124,7 @@
       "name": "Upload file in Google Drive",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "xa8mngwaDRMx3oRk",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "Google Drive account"
         }
       }
@@ -147,16 +147,16 @@
       "parameters": {
         "owner": {
           "__rl": true,
-          "value": "AndreGraccia",
+          "value": "YOUR_GITHUB_OWNER",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "AndreGraccia",
+          "value": "YOUR_GITHUB_REPO",
           "mode": "name"
         },
         "title": "N8N",
-        "body": "não sei ainda",
+        "body": ".",
         "labels": [],
         "assignees": []
       },
@@ -168,10 +168,10 @@
       ],
       "id": "f42e3d85-7ca7-41a7-9dfc-e6aded9e15a0",
       "name": "Create an issue in GitHub",
-      "webhookId": "bc6897fd-0f08-407d-8622-991c913f78d4",
+      "webhookId": "YOUR_WEBHOOK_ID",
       "credentials": {
         "githubApi": {
-          "id": "3Sm7gq7irGXc095U",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "GitHub account"
         }
       }
@@ -190,10 +190,10 @@
       ],
       "id": "8a84a7d5-5785-4e4f-85fa-7e70507b7589",
       "name": "Get many messages in Gmail",
-      "webhookId": "546a93eb-8127-469d-b0ac-211460ecaebd",
+      "webhookId": "YOUR_WEBHOOK_ID",
       "credentials": {
         "gmailOAuth2": {
-          "id": "z5MSM1llAFh4RMhZ",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "Gmail account"
         }
       }
@@ -246,7 +246,7 @@
       "name": "nemotron-3.5-super",
       "credentials": {
         "openAiApi": {
-          "id": "YQKEBNF1Wc7MtUzP",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "OpenAI account"
         }
       }
@@ -269,7 +269,7 @@
       "name": "neomotron-3-ultra",
       "credentials": {
         "openAiApi": {
-          "id": "YQKEBNF1Wc7MtUzP",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "OpenAI account"
         }
       }
@@ -292,7 +292,7 @@
       "name": "nemotron-3-ultra",
       "credentials": {
         "openAiApi": {
-          "id": "YQKEBNF1Wc7MtUzP",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "OpenAI account"
         }
       }
@@ -312,7 +312,7 @@
       "name": "Get a document in Google Docs",
       "credentials": {
         "googleDocsOAuth2Api": {
-          "id": "RqRzYUE7TJMmaz6T",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "Google Docs account"
         }
       }
@@ -332,7 +332,7 @@
       "name": "Create a document in Google Docs",
       "credentials": {
         "googleDocsOAuth2Api": {
-          "id": "RqRzYUE7TJMmaz6T",
+          "id": "YOUR_CREDENTIAL_ID",
           "name": "Google Docs account"
         }
       }
@@ -528,9 +528,9 @@
   "versionId": "2139b32d-834f-4d7e-af7c-c546a1243308",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "4f581d806676cdc725db2ecc2b526b66984be2627649a96660fe8251056b958c"
+    "instanceId": "YOUR_INSTANCE_ID"
   },
   "nodeGroups": [],
-  "id": "PUNWW78jcDjXQRG1",
+  "id": "YOUR_WORKFLOW_ID",
   "tags": []
 }
