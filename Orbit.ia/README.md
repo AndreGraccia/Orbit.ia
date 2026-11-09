@@ -1,77 +1,61 @@
-# Orbit — Personal AI Agent
+# Orbit — agente pessoal de IA
 
-Agente pessoal com interface React/Vite e orquestração pelo n8n. O repositório inclui uma configuração Docker para n8n e PostgreSQL e um workflow exportado.
+Chat React/Vite conectado a um workflow **n8n multi-agente** (orquestrador + subagentes de Docs/Gmail/Drive e de código/GitHub), usando modelos **gratuitos** do OpenRouter.
 
-> **Status:** melhorias de segurança e integração em andamento. As integrações externas (Google Workspace, GitHub e provedores de modelos) ainda precisam ser configuradas e testadas no seu ambiente n8n.
-
-## Arquitetura
-
-- **Orbit UI:** interface React/Vite.
-- **n8n:** recebe mensagens, executa o agente e devolve o resultado.
-- **Modelos e ferramentas:** configurados por credenciais e nós do n8n.
-- **PostgreSQL:** banco usado pelo n8n para persistência operacional.
-- **pgAdmin:** interface opcional para administração do PostgreSQL.
-
-## Pré-requisitos
-
-- Docker Desktop com Docker Compose.
-- Node.js LTS e npm para executar o frontend localmente.
-- Credenciais de provedor de modelo configuradas no n8n.
-
-## Configuração segura
-
-1. Copie `.env.example` para `.env` na raiz.
-2. Substitua todos os valores `CHANGE_ME` por valores aleatórios e fortes.
-3. **Nunca faça commit do arquivo `.env`.** O repositório ignora esse arquivo.
-4. Se você já usou as credenciais que estavam no arquivo versionado, trate-as como expostas e substitua as senhas de PostgreSQL/pgAdmin. Faça backup antes de alterar a chave de criptografia do n8n: alterar essa chave pode impedir a leitura das credenciais armazenadas.
-5. Inicie os serviços:
-
-```bash
-docker compose up -d
+```
+Frontend (React) ──POST /webhook/orbit-chat──▶ n8n
+                                               ├─ Orquestrador (memória por sessão)
+                                               ├─ agente_workspace_docs → Docs · Drive · Gmail
+                                               └─ agente_dev_codigo     → GitHub issues
 ```
 
-O n8n ficará disponível em `http://localhost:5678`; o pgAdmin usa a porta definida por `PGADMIN_PORT` (por padrão, `8080`).
+## Rodar em 5 passos
 
-## Configurar o frontend
-
-1. Entre na pasta `frontend`.
-2. Copie `.env.example` para `.env`.
-3. Configure `VITE_N8N_WEBHOOK_URL=http://localhost:5678/webhook/orbit-chat` para o webhook de produção/ativo. Durante testes manuais, use a URL de teste fornecida pelo editor do n8n, se aplicável.
-4. Execute:
+Requisitos: Docker Desktop e Node.js LTS.
 
 ```bash
-npm install
-npm run dev
+# 1. Segredos do backend
+cp .env.example .env        # troque todo CHANGE_ME por valores aleatórios
+
+# 2. n8n + PostgreSQL
+docker compose up -d        # pgAdmin é opcional: docker compose --profile admin up -d
+
+# 3. Frontend
+cd frontend && cp .env.example .env && npm install && npm run dev   # http://localhost:5173
 ```
 
-O Vite inicia normalmente em `http://localhost:5173`.
+4. Abra `http://localhost:5678`, crie o usuário dono e **importe** `Mente_de_IAs_Estrutura_n8n.json`.
+5. Crie a credencial **OpenAI API** com `Base URL = https://openrouter.ai/api/v1` e sua chave do OpenRouter (grátis), selecione-a nos 3 nós `modelo-*`, conecte Google/GitHub se quiser as ferramentas e **ative** o workflow.
 
-O frontend envia JSON com `message` e `chatInput` e espera que o workflow devolva texto ou JSON com um campo `output`, `text`, `response` ou `message`. As respostas são exibidas após o workflow terminar; o frontend não simula streaming real. Há um limite de espera de 120 segundos.
+> Sem a chave/credencial, o chat funciona mas responde com um erro amigável (HTTP 502) — é o comportamento esperado.
 
-## Importar o workflow
+## Modelos gratuitos (OpenRouter)
 
-Importe `Mente de IAs - Estrutura Oficial Corrigida.json` pelo editor do n8n e confira antes de ativar:
+Atual, por papel (verificado na API do OpenRouter; todos com suporte a *tool calling*):
 
-- Se as credenciais dos nós de modelo estão selecionadas no ambiente.
-- Se cada subagente tem nome, descrição, prompt e modelo configurados de acordo com sua versão do n8n.
-- Se as ferramentas Google Docs, Gmail, Drive e GitHub têm credenciais e parâmetros completos.
-- Se o webhook está ativo e usa o caminho `orbit-chat`.
-- Se a origem do frontend está permitida na configuração de CORS.
-- Se nenhuma ação externa é executada sem autorização adequada.
+| Papel | Modelo | Por quê |
+|---|---|---|
+| Orquestrador | `nvidia/nemotron-3-ultra-550b-a55b:free` | maior raciocínio, 1M de contexto |
+| Docs/Gmail/Drive | `nvidia/nemotron-3.5-lightning:free` | rápido, tarefas curtas de ferramenta |
+| Código | `cohere/north-mini-code:free` | afinado para código |
 
-O JSON exportado não transporta as credenciais do seu ambiente. Alguns nós podem precisar ser completados diretamente no editor do n8n; não presuma que as ferramentas externas funcionem apenas porque aparecem no workflow.
+Alternativas gratuitas com *tools*: `google/gemma-4-31b-it:free` (generalista forte, 262k), `google/gemma-4-26b-a4b-it:free` (mais rápido), `nvidia/nemotron-3.5-super-vl:free` (1M, visão), `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (leve, raciocínio). Modelos `:free` mudam e têm limite de requisições; se um falhar, troque o campo *Model* do nó. Lista atual: `https://openrouter.ai/api/v1/models` (filtre `:free`).
 
-## Testes recomendados
+## O que o workflow faz
 
-1. Envie uma mensagem simples e confirme que o frontend recebe a resposta.
-2. Teste uma resposta longa e confirme que não é truncada.
-3. Teste webhook desligado, URL incorreta e tempo limite.
-4. Confirme que o navegador não apresenta erros de CORS.
-5. Teste cada ferramenta externa individualmente antes de permitir ações reais.
+- Memória isolada por conversa (`sessionId` enviado pelo frontend; subagentes com sufixo próprio).
+- Subagentes recebem a tarefa real via `$fromAI` (antes recebiam um texto fixo).
+- Falhas do modelo/ferramentas → resposta JSON `502` tratada pelo chat.
+- Gmail limitado a 10 mensagens; ferramenta Git removida (inútil dentro do Docker).
+- CORS restrito a `localhost:5173`; ajuste `N8N_CORS_ALLOW_ORIGIN` e `allowedOrigins` do webhook ao publicar.
 
-## Segurança e limitações
+## Infra
 
-- Não exponha o editor n8n ou pgAdmin diretamente à internet sem autenticação e controles de rede apropriados.
-- Restrinja as origens CORS ao endereço real do frontend; CORS não substitui autenticação.
-- O histórico da interface fica na memória da página e é perdido ao recarregar. O PostgreSQL do n8n não persiste automaticamente o histórico de chat do frontend.
-- A remoção do `.env` desta versão não elimina cópias em commits antigos. Se valores reais foram commitados, rotacione-os. Para apagar o segredo do histórico, será necessária uma limpeza do histórico Git coordenada com todos os clones/colaboradores.
+- Imagens fixadas (`n8n 2.46.6`, `postgres 16.6`, `pgadmin 8.14`), healthcheck no n8n, portas só em `127.0.0.1`, limite de payload e timeout de execução, poda de execuções (7 dias).
+- Projeto Compose chama-se `orbit`; volumes de versões anteriores (`n8n-agent_*`) não são tocados. Se o n8n reiniciar em loop com *Mismatching encryption keys*, o volume é de outra chave: use o projeto novo ou restaure a chave antiga.
+
+## Segurança
+
+- Nunca faça commit do `.env`. Segredos que já estiveram no Git devem ser rotacionados.
+- Não exponha n8n/pgAdmin à internet sem autenticação. CORS não é autenticação.
+- Histórico do chat fica no `localStorage` do navegador (até 50 conversas).
