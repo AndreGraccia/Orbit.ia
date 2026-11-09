@@ -59,3 +59,10 @@ Alternativas gratuitas com *tools*: `google/gemma-4-31b-it:free` (generalista fo
 - Nunca faça commit do `.env`. Segredos que já estiveram no Git devem ser rotacionados.
 - Não exponha n8n/pgAdmin à internet sem autenticação. CORS não é autenticação.
 - Histórico do chat fica no `localStorage` do navegador (até 50 conversas).
+
+## Temas
+
+Botão **Tema** na barra lateral (salvo no navegador). 18 temas em `frontend/src/themes.js`:
+- **Sistemas** (derivados de `~/.claude/global-design-systems`): Linear, Raycast, Supabase, Vercel, OpenAI, Apple, Stripe, Notion, Figma, Coinbase, Cursor, Airbnb — usam as cores, raios e fontes do frontmatter; fontes proprietárias caem para Inter/Geist/sistema.
+- **Orbit** (claro/escuro) e **Extras** novos: Aurora, Terminal, Sunset, Papel.
+- Para criar o seu: adicione uma linha `t(id, nome, grupo, escuro?, {bg,panel,raise,line,line2,text,muted,accent,accent2,link}, raioCard, raioComposer)`.
