@@ -115,13 +115,3 @@ textarea::placeholder { color: var(--muted); }
   .bubble { max-width: 92%; }
 }
 
-/* theme picker */
-.themes { margin: 6px 0 0; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-top: 1px solid var(--line); max-height: 36vh; overflow: auto; }
-.themes h4 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-top: 4px; }
-.sw-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.sw { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line2); overflow: hidden; padding: 0; position: relative; }
-.sw i { position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
-.sw b { position: absolute; inset: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-.sw.on { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
-.theme-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; color: var(--muted); font-size: 13px; }
-.theme-btn:hover { background: var(--raise); color: var(--text); }

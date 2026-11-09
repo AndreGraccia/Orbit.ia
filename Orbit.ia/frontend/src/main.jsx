@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ArrowUp, Check, Copy, Menu, Palette, RotateCw, Sparkles, SquarePen, Square, Trash2, X } from 'lucide-react';
-import { THEMES, DEFAULT_THEME, applyTheme } from './themes.js';
+import { ArrowUp, Check, Copy, Menu, RotateCw, Sparkles, SquarePen, Square, Trash2, X } from 'lucide-react';
 import './styles.css';
 
 const WEBHOOK = import.meta.env.VITE_N8N_WEBHOOK_URL || '';
@@ -17,10 +16,6 @@ const SUGGESTIONS = [
   'Escreva um script Python que renomeie arquivos em lote',
   'Abra uma issue no GitHub descrevendo um bug'
 ];
-
-const THEME_KEY = 'orbit.theme';
-const savedTheme = () => { try { return localStorage.getItem(THEME_KEY) || DEFAULT_THEME; } catch { return DEFAULT_THEME; } };
-applyTheme(savedTheme());
 
 const uid = () => crypto.randomUUID();
 const newChat = () => ({ id: uid(), title: 'Nova conversa', messages: [], updated: Date.now() });
@@ -105,8 +100,6 @@ function App() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [drawer, setDrawer] = useState(false);
-  const [theme, setTheme] = useState(savedTheme);
-  const [themesOpen, setThemesOpen] = useState(false);
   const abortRef = useRef(null);
   const endRef = useRef(null);
   const taRef = useRef(null);
@@ -126,12 +119,6 @@ function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   });
-
-  function pickTheme(id) {
-    applyTheme(id);
-    setTheme(id);
-    try { localStorage.setItem(THEME_KEY, id); } catch { /* storage blocked */ }
-  }
 
   const patch = (id, fn) => setChats(cs => cs.map(c => (c.id === id ? { ...fn(c), updated: Date.now() } : c)));
 
@@ -212,23 +199,6 @@ function App() {
             </div>
           ))}
         </nav>
-        {themesOpen && (
-          <div className="themes">
-            {['Orbit', 'Sistemas', 'Extras'].map(g => (
-              <React.Fragment key={g}>
-                <h4>{g}</h4>
-                <div className="sw-row">
-                  {THEMES.filter(x => x.group === g).map(x => (
-                    <button key={x.id} className={`sw ${x.id === theme ? 'on' : ''}`} title={x.name} aria-label={`Tema ${x.name}`} aria-pressed={x.id === theme} onClick={() => pickTheme(x.id)}>
-                      <i style={{ background: x.vars.bg }} /><b style={{ background: x.vars.accent }} />
-                    </button>
-                  ))}
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        )}
-        <button className="theme-btn" onClick={() => setThemesOpen(o => !o)} aria-expanded={themesOpen}><Palette size={15} /> Tema: {THEMES.find(x => x.id === theme)?.name}</button>
         <div className="side-foot">Conversas ficam só neste navegador.</div>
       </aside>
       {drawer && <button className="scrim" aria-label="Fechar menu" onClick={() => setDrawer(false)} />}
