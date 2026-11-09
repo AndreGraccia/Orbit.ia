@@ -159,8 +159,9 @@ function App() {
       const answer = await askAgent(snapshot, clean, ctrl.signal);
       patch(snapshot.id, c => ({ ...c, messages: [...c.messages, { id: uid(), role: 'assistant', content: answer }] }));
     } catch (e) {
-      const stopped = e.name === 'AbortError' && ctrl.signal.reason !== 'timeout';
-      const reason = e.name === 'AbortError' ? (stopped ? 'Resposta interrompida.' : 'Tempo limite de 120 s excedido.') : `Falha ao falar com o agente: ${e.message}`;
+      // fetch rejects with signal.reason (not AbortError) when abort(reason) is used
+      const timedOut = ctrl.signal.reason === 'timeout';
+      const reason = ctrl.signal.aborted ? (timedOut ? 'Tempo limite de 120 s excedido.' : 'Resposta interrompida.') : `Falha ao falar com o agente: ${e.message}`;
       patch(snapshot.id, c => ({ ...c, messages: [...c.messages, { id: uid(), role: 'assistant', error: true, content: reason }] }));
     } finally {
       clearTimeout(timer);
